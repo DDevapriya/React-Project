@@ -1,56 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import Loading from './Loading'
-import Tours from './Tours'
-
-const url = 'https://course-api.com/react-tours-project'
+import React, { useState } from 'react';
+import Menu from './Menu';
+import Categories from './Categories';
+import items from './data';
+const allCategories = ['all', ...new Set(items.map((item) => item.category))];
 
 function App() {
-  const [loading,setLoading]=useState(true)
-  const [tours,setTours]=useState([])
+  const [menuItems, setMenuItems] = useState(items);
+  const [categories, setCategories] = useState(allCategories);
 
-   const removeTour=(id)=>{
-    const newTours=tours.filter((tour)=>tour.id !==id)
-    setTours(newTours)
-  }
-
-  const fetchTours=async()=> {
-    setLoading(true)
-    try {
-      const response=await fetch(url)
-      const tours=await response.json()
-      setLoading(false)
-      setTours(tours)
-    } catch (error) {
-      setLoading(false)
-      console.log(error)
+  const filterItems = (category) => {
+    if (category === 'all') {
+      setMenuItems(items);
+      return;
     }
-  }
-useEffect(() => {
-  fetchTours()
-},[])
-  if (loading){
-    return(
-      <main>
-        <Loading/>
-      </main>
-    )
-  }
+    const newItems = items.filter((item) => item.category === category);
+    setMenuItems(newItems);
+  };
 
-  if(tours.length===0){
-    return(
-      <main>
-        <div className='title'>
-          <h2>no tours left</h2>
-          <button className='btn' onClick={()=> fetchTours()}>
-            Refresh
-          </button>
-        </div>
-      </main>
-    )
-  }
   return (
     <main>
-      <Tours tours={tours} removeTour={removeTour} />
+      <section className="menu section">
+        <div className="title">
+          <h2>our menu</h2>
+          <div className="underline"></div>
+        </div>
+        <Categories categories={categories} filterItems={filterItems} />
+        <Menu items={menuItems} />
+      </section>
     </main>
   );
 }
